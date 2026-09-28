@@ -10,3 +10,6 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["best_buy_zwei*"]
+
+[tool.pytest.ini_options]
+addopts = "-v"
