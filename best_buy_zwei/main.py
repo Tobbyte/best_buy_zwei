@@ -29,7 +29,7 @@ TODOs:
 
 import sys
 
-from config import (
+from .config import (
     ALL_PRODUCT_IN_STORE,
     MENU_LIST_ALL_PRODUCTS,
     MENU_PLACE_ORDER,
@@ -48,9 +48,9 @@ from config import (
     ORDER_PRODUCT_PROMPT,
     TOTAL_STORE_STOCK_MSG,
 )
-from products import Product
-from store import Store
-from valid_tobbyte_module.valid_tobbyte.validator_fn import (
+from .products import Product
+from .store import Store
+from .valid_tobbyte_module.valid_tobbyte.validator_fn import (
     validate_fn as get_valid_input,
 )
 
