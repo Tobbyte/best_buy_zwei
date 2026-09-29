@@ -38,11 +38,14 @@ def PRODUCT_PRETTY_PRINT(  # noqa: ANN201, D103, N802
     price: float,
     quantity: float,  # pyright: ignore[reportRedeclaration]
     active: bool,
+    maximum: int | None = None,
 ):
     if quantity == inf:
         quantity: str = "unlimited"
-    return f"'{name}', Price: {price:.2f} ¤, Quantity: {quantity}" + (
-        " (inactive)" if not active else ""
+    return (
+        f"'{name}', Price: {price:.2f} ¤, Quantity: {quantity}"
+        + (" (inactive)" if not active else "")
+        + (f" Limited to {maximum} per order!" if maximum else "")
     )
 
 VALIDATE_ERR_NOT_OF_TYPE = "{name} is not of type {type}."
