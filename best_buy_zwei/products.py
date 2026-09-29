@@ -68,6 +68,7 @@ class Product:
         """Initialize a Product instance."""
         self._set_name(name)
         self._set_price(price)
+        # important to use public set_quantity here to use validation
         self.set_quantity(quantity)
         self._active = quantity > 0
 
@@ -106,6 +107,18 @@ class Product:
         """
         return self._quantity
 
+    def _set_quantity(self, quantity: int) -> None:
+        """Set the quantity of the product.
+
+        Internal setter for quantity to distinguish between calls from
+        inside vs from outside.
+        Ensures it doesn't go below zero.
+        Deactivates the product if quantity is zero.
+        """
+        if quantity == 0:
+            self.deactivate()
+        self._quantity = quantity
+
     @property
     def active(self) -> bool:
         """Return whether the product is active.
@@ -124,8 +137,6 @@ class Product:
     def set_quantity(self, quantity: int) -> None:
         """Set the quantity of the product.
 
-        Ensures it doesn't go below zero.
-        Deactivates the product if quantity is zero.
         Be aware that setting a quantity above 0 when its not active
         - whether deliberately set or automatically because of 0
         quantity - will not automatically activate the product.
@@ -135,7 +146,7 @@ class Product:
         if validated_qty == 0:
             self.deactivate()
 
-        self._quantity = validated_qty
+        self._set_quantity(validated_qty)
 
     def is_active(self) -> bool:
         """Return whether product is available for purchase (active).
@@ -191,7 +202,7 @@ class Product:
         if quantity > self._quantity:
             raise ValueError(PRODUCT_ERR_OUTOFSTOCK.format(name=self._name))
 
-        self.set_quantity(self._quantity - quantity)
+        self._set_quantity(self._quantity - quantity)
 
         return float(quantity * self._price)
 
