@@ -1,7 +1,6 @@
 # ruff:noqa
 from best_buy_zwei.config import PRODUCT_PRETTY_PRINT
 import pytest
-import sys
 from best_buy_zwei.products import (
     Product,
     validate_non_negative_int,
