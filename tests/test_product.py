@@ -249,5 +249,58 @@ def test_product_show_for_inactive(capsys):
     expected = capsys.readouterr().out
     assert captured == expected
 
+
+"""
+buy()
+
+(2) =>
+    set self.quantity -2,
+    return float(2*self.price)
+(10) (stock 10) => product.active == False
+inactive        => ValueError w prod name
+(0)             => ValueError w prod name
+quant > stock   => ValueError w prod name
+quant = -1      => ValueError w param name
+"""
+
+
+def test_buy_valid():
+    name, price, quantity = ("Gadget", 100, 10)
+    product = Product(name, price, quantity)
+    result = product.buy(2)
+    assert result == 2 * product.price
+    assert product.quantity == quantity - 2
+
+
+def test_buy_valid_all_stock_deactivates():
+    name, price, quantity = ("Gadget", 100, 10)
+    product = Product(name, price, quantity)
+    result = product.buy(10)
+    assert result == 10 * product.price
+    assert product.quantity == quantity - 10
+    assert not product.active
+
+
+@pytest.mark.parametrize(
+    "buy_quant, stock, is_active",
+    [(10, 100, False), (101, 100, True), (0, 100, True)],
+)
+def test_buy_invalid(buy_quant, stock, is_active):
+    product = Product("Gadget", 100, stock)
+    if not is_active:
+        product.deactivate()
+
+    with pytest.raises(ValueError) as err:
+        product.buy(buy_quant)
+    assert "Gadget" in str(err.value)
+
+
+def test_buy_negative_quant():
+    product = Product("Gadget", 100, 10)
+    with pytest.raises(ValueError) as err:
+        product.buy(-1)
+    assert "quantity" in str(err.value)
+
+
 if __name__ == "__main__":
     pytest.main()
