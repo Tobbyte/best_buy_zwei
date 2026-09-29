@@ -31,6 +31,7 @@ PRODUCT_ERR_CANTACTIVATENULLQUANT = "Can't activate product with quantity 0."
 NONSTOCKPRODUCT_ERR_CANTSETQUANTITY = (
     "Can't set quantity of NonStockedProduct."
 )
+LIMITED_PRODUCT_EXCEED_MAXIMUM = "Can't buy more than {maximum} pcs of {name}."
 
 
 def PRODUCT_PRETTY_PRINT(  # noqa: ANN201, D103, N802

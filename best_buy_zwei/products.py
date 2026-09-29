@@ -4,6 +4,7 @@ from math import inf
 from typing import Any
 
 from best_buy_zwei.config import (
+    LIMITED_PRODUCT_EXCEED_MAXIMUM,
     NONSTOCKPRODUCT_ERR_CANTSETQUANTITY,
     PRODUCT_ERR_CANTACTIVATENULLQUANT,
     PRODUCT_ERR_CANTBYINACTIVE,
@@ -237,3 +238,87 @@ class NonStockedProduct(Product):
 
         """
         raise NotImplementedError(NONSTOCKPRODUCT_ERR_CANTSETQUANTITY)
+
+
+class LimitedProduct(Product):
+    """A class representing a Product that can be bought n times.
+
+    TBD:
+    - The existence of such a Product class is questionable: A shipping
+    fee as e.g. should be added automatically and therefore could be a
+    normal but non-user facing product. If it should be used like a
+    "limited offer" per user or similar, there has to be a user tracking
+    which, again, would be fine with a regular Product of limited
+    quantity since tracking has to be done in the Store ...
+    Better would be a flag in the Store class marking which products
+    are of limited availability and add some special items like fees
+    automatically.
+    . Won't fix as it's requested.
+    - I a remaining maximum of zero should deactivate the product is not
+    defined. Chose not to.
+    """
+
+    _maximum: int  # bad name, but given.
+    _maximum_initially: int  # for output purposes
+
+    def __init__(
+        self,
+        name: str,
+        price: float,
+        quantity: int,
+        maximum: int,
+    ) -> None:
+        """Initialize a Product instance."""
+        super().__init__(name, price, quantity)
+        # important to use public set_maximum here to use validation
+        self.set_maximum(maximum)
+        self._maximum_initially = maximum
+
+    @property
+    def maximum(self) -> int:
+        """Return the maximum buyability of the product."""
+        return self._maximum
+
+    def _set_maximum(self, maximum: int) -> None:
+        """Set the internal _maximum of the product.
+
+        Internal setter for maximum that doesn't resets
+        _maximum_initially.
+        """
+        self._maximum = maximum
+
+    def set_maximum(self, maximum: int) -> None:
+        """Set the maximum buyability of the product."""
+        valid_max = validate_non_negative_int("maximum", maximum)
+        self._set_maximum(valid_max)
+        self._maximum_initially = maximum
+
+    def show(self) -> None:
+        """Print product details in a user-friendly format."""
+        print(
+            PRODUCT_PRETTY_PRINT(
+                self._name,
+                self._price,
+                self._quantity,
+                self._active,
+                self._maximum_initially,
+            ),
+        )
+
+    def buy(self, quantity: int) -> float:
+        """Buy a specified quantity of the product.
+
+        Raises ValueError if the requested quantity exceeds
+        the maximum limit.
+        """
+        if quantity > self._maximum:
+            raise ValueError(
+                LIMITED_PRODUCT_EXCEED_MAXIMUM.format(
+                    maximum=self._maximum_initially,
+                    name=self._name,
+                ),
+            )
+
+        self._set_maximum(self._maximum - quantity)
+
+        return super().buy(quantity)
