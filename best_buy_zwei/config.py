@@ -28,6 +28,10 @@ PRODUCT_ERR_CANTBYINACTIVE = "Can't buy inactive {name}."
 PRODUCT_ERR_CANTBYZEROQUANT = "Can't buy 0 pcs of {name}."
 PRODUCT_ERR_CANTACTIVATENULLQUANT = "Can't activate product with quantity 0."
 
+NONSTOCKPRODUCT_ERR_CANTSETQUANTITY = (
+    "Can't set quantity of NonStockedProduct."
+)
+
 
 def PRODUCT_PRETTY_PRINT(  # noqa: ANN201, D103, N802
     name: str,

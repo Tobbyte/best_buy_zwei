@@ -4,6 +4,7 @@ from math import inf
 from typing import Any
 
 from best_buy_zwei.config import (
+    NONSTOCKPRODUCT_ERR_CANTSETQUANTITY,
     PRODUCT_ERR_CANTACTIVATENULLQUANT,
     PRODUCT_ERR_CANTBYINACTIVE,
     PRODUCT_ERR_CANTBYZEROQUANT,
@@ -208,7 +209,15 @@ class Product:
 
 
 class NonStockedProduct(Product):
-    """A class representing a product with unlimited quantity."""
+    """A class representing a product with unlimited quantity.
+
+    Note: The assignment states "the quantity should be set to zero and
+    always stay that way". I have decided to consciously deviate:
+    A quantity of 0 already has a distinct meaning and operations
+    depending on a 0 quantity. NonStockProduct having a quantity 0
+    would mean to work around that introducing fragility.
+    Also, infinite simply makes more sense and enables minimum overhead.
+    """
 
     _quantity: float
 
@@ -224,12 +233,7 @@ class NonStockedProduct(Product):
 
         Since there's always unlimited quantity, it can't be
         set like in a regular Product.
-
-        Todo:
-        - smell of bad inheritance hierarchy. refactor Product?
-
         Raises NotImplementedError if called.
 
         """
-        err_msg = "Can't set quantity of NonStockedProduct"
-        raise NotImplementedError(err_msg)
+        raise NotImplementedError(NONSTOCKPRODUCT_ERR_CANTSETQUANTITY)
