@@ -1,8 +1,9 @@
-"""Product class for the Best Buy application."""
+"""Product classes for the Best Buy application."""
 
+from math import inf
 from typing import Any
 
-from .config import (
+from best_buy_zwei.config import (
     PRODUCT_ERR_CANTACTIVATENULLQUANT,
     PRODUCT_ERR_CANTBYINACTIVE,
     PRODUCT_ERR_CANTBYZEROQUANT,
@@ -195,93 +196,55 @@ class Product:
         return float(quantity * self._price)
 
 
-## debug
-if __name__ == "__main__":
-    print("=== Product debug/manual tests ===\n")
+class NonStockedProduct(Product):
+    """A class representing a product with unlimited quantity."""
 
-    # --- valid construction ---
-    mac = Product("MacBook Air M2", price=1450, quantity=100)
-    bose = Product("Bose QuietComfort Earbuds", price=250, quantity=3)
-    assert mac.quantity == mac.get_quantity() == 100
-    assert mac.active is True
-    print("OK: construction + quantity/active accessors")
+    _quantity: float
 
-    # --- validation errors on construction ---
-    bad_inputs = [
-        ("", 10, 5, "empty name"),
-        ("Valid", -5, 5, "negative price"),
-        ("Valid", 10, -1, "negative quantity"),
-        ("Valid", "10", 5, "non-numeric price"),
-    ]
-    for bad_name, bad_price, bad_qty, label in bad_inputs:
-        try:
-            Product(bad_name, price=bad_price, quantity=bad_qty)  # type: ignore
-        except (TypeError, ValueError) as exc:
-            print(f"OK: rejected {label} -> {exc}")
-        else:
-            print(f"FAILED: {label} was accepted but should have raised")
+    def __init__(self, name: str, price: float) -> None:
+        """Initialize a Product instance."""
+        self._set_name(name)
+        self._set_price(price)
+        self._active = True
+        self._quantity = inf
 
-    # --- errors on external setting ---
-    product = Product("Gadget", price=20, quantity=10)
-    not_allowed = [
-        ("name", "New Name"),
-        ("price", 30),
-        ("quantity", 5),
-        ("active", False),
-    ]
-    for attr, new_value in not_allowed:
-        try:
-            setattr(product, attr, new_value)
-        except AttributeError as exc:
-            print(f"OK: rejected external change of {attr} -> {exc}")
-        else:
-            print(f"FAILED: external change of {attr} should raise")
+    def set_quantity(self) -> None:
+        """Override super class.
 
-    # --- quantity 0 on init leaves product inactive, activate() guards it ---
-    empty = Product("Sold Out Gadget", price=20, quantity=0)
-    assert empty.active is False
-    print("OK: quantity 0 on init leaves product inactive")
-    try:
-        empty.activate()
-    except ValueError as exc:
-        print(f"OK: activate() on 0-quantity product rejected -> {exc}")
-    else:
-        print("FAILED: activate() should refuse a 0-quantity product")
+        Since there's always unlimited quantity, it can't be
+        set like in a regular Product.
 
-    # --- buy(): happy path ---
-    total = bose.buy(2)
-    assert total == 500
-    assert bose.quantity == 1
-    print(
-        f"OK: buy(2) -> {total} currency units, remaining stock {bose.quantity}",
-    )
+        Todo:
+        - smell of bad inheritance hierarchy. refactor Product?
 
-    # --- buy(): more than in stock ---
-    try:
-        bose.buy(5)
-    except ValueError as exc:
-        print(f"OK: buy() over stock rejected -> {exc}")
-    else:
-        print("FAILED: buying more than available stock should raise")
+        Raises NotImplementedError if called.
 
-    # --- buy(): exactly the remaining stock deactivates the product ---
-    bose.buy(1)
-    assert bose.quantity == 0
-    assert bose.active is False
-    print("OK: buying the last unit deactivates the product automatically")
+        """
+        err_msg = "Can't set quantity of NonStockedProduct"
+        raise NotImplementedError(err_msg)
 
-    # --- buy(): now-inactive product ---
-    try:
-        bose.buy(1)
-    except ValueError as exc:
-        print(f"OK: buy() on inactive product rejected -> {exc}")
-    else:
-        print("FAILED: buying an inactive product should raise")
+    def activate(self) -> None:
+        """Activate the product, making it available for purchase."""
+        self._active = True
 
-    # --- buy(): zero quantity ---
-    try:
-        mac.buy(0)
-    except ValueError as exc:
-        print(f"OK: buy(0) rejected -> {exc}")
-    else:
-        print("FAILED: buy(0) should raise")
+    def buy(self, quantity: int) -> float:
+        """Buy a specified quantity of the product.
+
+        Raises ValueError if the product is inactive or if the quantity
+        is negative.
+        """
+        if not self._active:
+            raise ValueError(
+                PRODUCT_ERR_CANTBYINACTIVE.format(name=self._name),
+            )
+
+        quantity = validate_non_negative_int("quantity", quantity)
+
+        if quantity == 0:
+            raise ValueError(
+                PRODUCT_ERR_CANTBYZEROQUANT.format(
+                    name=self._name,
+                ),
+            )
+
+        return float(quantity * self._price)

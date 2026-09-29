@@ -1,4 +1,5 @@
 """Configuration file for the Best Buy application."""
+from math import inf
 
 ORDER_PRODUCT_PROMPT = "Which product # do you want? (empty to exit) "
 ORDER_EXIT_PROMPT = "When you want to finish order, enter empty text."
@@ -28,7 +29,14 @@ PRODUCT_ERR_CANTBYZEROQUANT = "Can't buy 0 pcs of {name}."
 PRODUCT_ERR_CANTACTIVATENULLQUANT = "Can't activate product with quantity 0."
 
 
-def PRODUCT_PRETTY_PRINT(name: str, price: float, quantity: int, active: bool):  # noqa: ANN201, D103, FBT001, N802
+def PRODUCT_PRETTY_PRINT(  # noqa: ANN201, D103, N802
+    name: str,
+    price: float,
+    quantity: float,  # pyright: ignore[reportRedeclaration]
+    active: bool,
+):
+    if quantity == inf:
+        quantity: str = "unlimited"
     return f"'{name}', Price: {price:.2f} ¤, Quantity: {quantity}" + (
         " (inactive)" if not active else ""
     )
