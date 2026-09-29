@@ -197,7 +197,7 @@ class Product:
 
 
 class NonStockedProduct(Product):
-    """Asd."""
+    """A class representing a product with unlimited quantity."""
 
     _quantity: float
 
@@ -209,10 +209,15 @@ class NonStockedProduct(Product):
         self._quantity = inf
 
     def set_quantity(self) -> None:
-        """Asd.
+        """Override super class.
+
+        Since there's always unlimited quantity, it can't be
+        set like in a regular Product.
 
         Todo:
         - smell of bad inheritance hierarchy. refactor Product?
+
+        Raises NotImplementedError if called.
 
         """
         err_msg = "Can't set quantity of NonStockedProduct"
@@ -225,8 +230,8 @@ class NonStockedProduct(Product):
     def buy(self, quantity: int) -> float:
         """Buy a specified quantity of the product.
 
-        Raises ValueError if the product is inactive, if the quantity is
-        negative, or if the requested quantity exceeds available stock.
+        Raises ValueError if the product is inactive or if the quantity
+        is negative.
         """
         if not self._active:
             raise ValueError(
