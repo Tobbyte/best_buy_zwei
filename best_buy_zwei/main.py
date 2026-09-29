@@ -52,7 +52,7 @@ from best_buy_zwei.config import (
     ORDER_PRODUCT_PROMPT,
     TOTAL_STORE_STOCK_MSG,
 )
-from best_buy_zwei.products import Product
+from best_buy_zwei.products import NonStockedProduct, Product
 from best_buy_zwei.store import Store
 from best_buy_zwei.valid_tobbyte_module.valid_tobbyte.validator_fn import (
     validate_fn as get_valid_input,
@@ -238,6 +238,7 @@ def init_superstore() -> None:
         Product("MacBook Air M2", price=1450, quantity=100),
         Product("Bose QuietComfort Earbuds", price=250, quantity=500),
         Product("Google Pixel 7", price=500, quantity=250),
+        NonStockedProduct("Windows License", price=125),
     ]
     BestBuyApp(product_list).start()
 
