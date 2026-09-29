@@ -1,4 +1,4 @@
-"""Product class for the Best Buy application."""
+"""Product classes for the Best Buy application."""
 
 from math import inf
 from typing import Any
