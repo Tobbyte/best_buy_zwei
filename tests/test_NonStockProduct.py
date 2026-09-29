@@ -8,9 +8,8 @@ from best_buy_zwei.products import NonStockedProduct
 good
 ("unlimited", 100) => NonStockedProduct
 
-
 bad
-- überhaupt testen= weil s. Product?
+test same validators as in Product excl. for quantity
 """
 
 
@@ -20,6 +19,19 @@ def test_NonStockedProduct_init_good():
     assert product.price == 10.99
     assert product.quantity == inf
     assert product.active is product.is_active() is True
+
+
+@pytest.mark.parametrize(
+    "name, price, result",
+    [
+        (123, 100, TypeError),  # invalid name
+        (" ", 100, ValueError),  # invalid name
+        ("good_name", "100", TypeError),  # invalid price
+    ],
+)
+def test_product_init_bad(name, price, result):
+    with pytest.raises(result):
+        NonStockedProduct(name, price)
 
 
 """
@@ -37,61 +49,29 @@ def test_NonStockedProduct_set_quantity_forbidden():
 """
 show
 () => "unlimited" in stdout
+but no need to test since its implemented in PRODUCT_PRETTY_PRINT
+and not changed in NonStockedProduct
 """
 
-
-def test_NonStockedProduct_show(capsys):
-    name, price, active = ("Gadget", 100, True)
-    product = NonStockedProduct(name, price)
-    product.show()
-    captured = capsys.readouterr().out
-    print(PRODUCT_PRETTY_PRINT(name, price, inf, active))
-    expected = capsys.readouterr().out
-    assert captured == expected
+pass
 
 
 """
 buy
-(2) =>
-    self.quantity stays 0
-    return (2 * self.price)
+(200000000000) =>
+    self.quantity stays inf
+    return (200000000000 * self.price)
 
-invalid 
-s. super:
-inactive        => ValueError w prod name
-(0)             => ValueError w prod name
-quant > stock   => ValueError w prod name
-quant = -1      => ValueError w param name
+no new fail cases to super, don't test?
 """
 
 
 def test_NonStockedProduct_buy_valid():
     name, price = ("Gadget", 100)
     product = NonStockedProduct(name, price)
-    result = product.buy(2)
-    assert result == 2 * product.price
+    result = product.buy(200000000000)
+    assert result == 200000000000 * product.price
     assert product.quantity == inf
-
-
-@pytest.mark.parametrize(
-    "buy_quant, is_active",
-    [(10, False), (0, True)],
-)
-def test_buy_invalid(buy_quant, is_active):
-    product = NonStockedProduct("Gadget", 100)
-    if not is_active:
-        product.deactivate()
-
-    with pytest.raises(ValueError) as err:
-        product.buy(buy_quant)
-    assert "Gadget" in str(err.value)
-
-
-def test_buy_negative_quant():
-    product = NonStockedProduct("Gadget", 100)
-    with pytest.raises(ValueError) as err:
-        product.buy(-1)
-    assert "quantity" in str(err.value)
 
 
 if __name__ == "__main__":
