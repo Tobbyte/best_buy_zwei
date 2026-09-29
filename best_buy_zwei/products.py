@@ -233,29 +233,3 @@ class NonStockedProduct(Product):
         """
         err_msg = "Can't set quantity of NonStockedProduct"
         raise NotImplementedError(err_msg)
-
-    def activate(self) -> None:
-        """Activate the product, making it available for purchase."""
-        self._active = True
-
-    def buy(self, quantity: int) -> float:
-        """Buy a specified quantity of the product.
-
-        Raises ValueError if the product is inactive or if the quantity
-        is negative.
-        """
-        if not self._active:
-            raise ValueError(
-                PRODUCT_ERR_CANTBYINACTIVE.format(name=self._name),
-            )
-
-        quantity = validate_non_negative_int("quantity", quantity)
-
-        if quantity == 0:
-            raise ValueError(
-                PRODUCT_ERR_CANTBYZEROQUANT.format(
-                    name=self._name,
-                ),
-            )
-
-        return float(quantity * self._price)
