@@ -1,5 +1,6 @@
 """Product class for the Best Buy application."""
 
+from math import inf
 from typing import Any
 
 from best_buy_zwei.config import (
@@ -191,6 +192,55 @@ class Product:
             raise ValueError(PRODUCT_ERR_OUTOFSTOCK.format(name=self._name))
 
         self.set_quantity(self._quantity - quantity)
+
+        return float(quantity * self._price)
+
+
+class NonStockedProduct(Product):
+    """Asd."""
+
+    _quantity: float
+
+    def __init__(self, name: str, price: float) -> None:
+        """Initialize a Product instance."""
+        self._set_name(name)
+        self._set_price(price)
+        self._active = True
+        self._quantity = inf
+
+    def set_quantity(self) -> None:
+        """Asd.
+
+        Todo:
+        - smell of bad inheritance hierarchy. refactor Product?
+
+        """
+        err_msg = "Can't set quantity of NonStockedProduct"
+        raise NotImplementedError(err_msg)
+
+    def activate(self) -> None:
+        """Activate the product, making it available for purchase."""
+        self._active = True
+
+    def buy(self, quantity: int) -> float:
+        """Buy a specified quantity of the product.
+
+        Raises ValueError if the product is inactive, if the quantity is
+        negative, or if the requested quantity exceeds available stock.
+        """
+        if not self._active:
+            raise ValueError(
+                PRODUCT_ERR_CANTBYINACTIVE.format(name=self._name),
+            )
+
+        quantity = validate_non_negative_int("quantity", quantity)
+
+        if quantity == 0:
+            raise ValueError(
+                PRODUCT_ERR_CANTBYZEROQUANT.format(
+                    name=self._name,
+                ),
+            )
 
         return float(quantity * self._price)
 
