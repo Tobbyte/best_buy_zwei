@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from config import (
+from best_buy_zwei.config import (
     PRODUCT_ERR_CANTACTIVATENULLQUANT,
     PRODUCT_ERR_CANTBYINACTIVE,
     PRODUCT_ERR_CANTBYZEROQUANT,

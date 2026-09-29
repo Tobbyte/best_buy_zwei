@@ -2,10 +2,10 @@
 
 from typing import Any
 
-from config import (
+from best_buy_zwei.config import (
     VALIDATE_ERR_NOT_OF_TYPE,
 )
-from products import Product
+from best_buy_zwei.products import Product
 
 
 def _validate_is_product(name: str, value: Any) -> "Product":  # noqa: ANN401

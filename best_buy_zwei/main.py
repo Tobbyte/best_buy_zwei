@@ -28,8 +28,12 @@ TODOs:
 """
 
 import sys
+from pathlib import Path
 
-from config import (
+# make runnable from wherever.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from best_buy_zwei.config import (
     ALL_PRODUCT_IN_STORE,
     MENU_LIST_ALL_PRODUCTS,
     MENU_PLACE_ORDER,
@@ -48,9 +52,9 @@ from config import (
     ORDER_PRODUCT_PROMPT,
     TOTAL_STORE_STOCK_MSG,
 )
-from products import Product
-from store import Store
-from valid_tobbyte_module.valid_tobbyte.validator_fn import (
+from best_buy_zwei.products import Product
+from best_buy_zwei.store import Store
+from best_buy_zwei.valid_tobbyte_module.valid_tobbyte.validator_fn import (
     validate_fn as get_valid_input,
 )
 
