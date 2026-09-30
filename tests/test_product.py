@@ -259,6 +259,22 @@ def test_product_show_for_inactive(capsys):
     assert captured == expected
 
 
+def test_product_comparison_uses_price():
+    cheaper = Product("Cheaper", price=10, quantity=1)
+    more_expensive = Product("More expensive", price=20, quantity=1)
+
+    assert cheaper < more_expensive
+    assert more_expensive > cheaper
+
+
+def test_product_comparison_with_equal_prices():
+    first = Product("First", price=10, quantity=1)
+    second = Product("Second", price=10, quantity=1)
+
+    assert not first < second
+    assert not first > second
+
+
 def test_product_str_for_inactive(capsys):
     name, price, quantity, active = ("Gadget", 100, 0, False)
     product = Product(name, price, quantity)

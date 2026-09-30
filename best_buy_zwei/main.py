@@ -33,6 +33,7 @@ TODOs:
     - while ordering: unavailable products (all in card) shouldn't be
       selectable instead of failing with "0 available". bigger refactor,
       need to recalc menu etc. Won't fix for now.
+    - make use of functools total_ordering
 
 
 ~ Made with ❤️ and without ai or code completion ~

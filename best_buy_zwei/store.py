@@ -42,6 +42,16 @@ class Store:
         """
         return self._products
 
+    def __contains__(self, product: object) -> bool:
+        """Return whether a product is present in the store."""
+        return product in self._products
+
+    def __add__(self, other: object) -> "Store":
+        """Return a new store containing products from both stores."""
+        if not isinstance(other, Store):
+            return NotImplemented
+        return Store(self._products + other.products)
+
     def _set_products(self, products: list[Product] | None) -> None:
         """Set the list of products in the store."""
         if not products:
