@@ -37,7 +37,7 @@ class BestBuyApp:  # pylint: disable=R0903
         """Init a new instance."""
         self.store = Store(product_list)
 
-    def _place_order(self) -> None:  # noqa: C901
+    def _place_order(self) -> None:  # noqa: C901, PLR0915
         """Place an order for products.
 
         Prompts user to select products and quantities, adds them to a
@@ -94,6 +94,8 @@ class BestBuyApp:  # pylint: disable=R0903
 
         def _confirm_order() -> None:
             print("\n\n***********")
+            _print_cart()
+            print("***********")
             print(ORDER_PLACED.format(total=self.store.order(shopping_cart)))
             print("***********")
 
