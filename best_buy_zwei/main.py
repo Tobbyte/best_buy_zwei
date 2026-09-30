@@ -52,7 +52,15 @@ from best_buy_zwei.config import (
     ORDER_PRODUCT_PROMPT,
     TOTAL_STORE_STOCK_MSG,
 )
-from best_buy_zwei.products import LimitedProduct, NonStockedProduct, Product
+from best_buy_zwei.products import (
+    LimitedProduct,
+    NonStockedProduct,
+    PercentDiscount,
+    Product,
+    PromotedProduct,
+    SecondHalfPrice,
+    ThirdOneFree,
+)
 from best_buy_zwei.store import Store
 from best_buy_zwei.valid_tobbyte_module.valid_tobbyte.validator_fn import (
     validate_fn as get_valid_input,
@@ -62,7 +70,7 @@ from best_buy_zwei.valid_tobbyte_module.valid_tobbyte.validator_fn import (
 class BestBuyApp:  # pylint: disable=R0903
     """The Best Buy application."""
 
-    def __init__(self, product_list: list[Product] | None = None) -> None:
+    def __init__(self, product_list: list | None = None) -> None:
         """Init a new instance."""
         self.store = Store(product_list)
 
@@ -250,6 +258,22 @@ def init_superstore() -> None:
         Product("Google Pixel 7", price=500, quantity=250),
         NonStockedProduct("Windows License", price=125),
         LimitedProduct("Shipping", price=10, quantity=250, maximum=1),
+        PromotedProduct(
+            Product("Extended Warranty", price=250, quantity=250),
+            PercentDiscount(20),
+        ),
+        PromotedProduct(
+            Product("USB-C Cable", price=10, quantity=250),
+            SecondHalfPrice(),
+        ),
+        PromotedProduct(
+            Product("USB-C Adapter", price=15, quantity=250),
+            ThirdOneFree(),
+        ),
+        PromotedProduct(
+            Product("Stacked Promo Exampl", price=50, quantity=250),
+            [PercentDiscount(10), SecondHalfPrice(), ThirdOneFree()],
+        ),
     ]
     BestBuyApp(product_list).start()
 
