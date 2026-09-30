@@ -51,4 +51,4 @@ def PRODUCT_PRETTY_PRINT(  # noqa: ANN201, D103, N802
 
 VALIDATE_ERR_NOT_OF_TYPE = "{name} is not of type {type}."
 VALIDATE_ERR_STR_EMPTY = "{name} can't be empty."
-VALIDATE_ERR_MUST_BE_POSITIVE = "{name} can't be negativ."
+VALIDATE_ERR_MUST_BE_POSITIVE = "{name} can't be negative."

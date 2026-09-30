@@ -240,7 +240,7 @@ class NonStockedProduct(Product):
     _quantity: float
 
     def __init__(self, name: str, price: float) -> None:
-        """Initialize a Product instance."""
+        """Initialize a NonStockedProduct instance."""
         self._set_name(name)
         self._set_price(price)
         self._active = True
@@ -325,8 +325,9 @@ class LimitedProduct(Product):
     def buy(self, quantity: int) -> float:
         """Buy a specified quantity of the product.
 
-        Raises ValueError if the requested quantity exceeds
-        the maximum limit.
+        Raises ValueError if the requested quantity exceeds the maximum
+        limit, as well as the same conditions as the base Product class.
+
         """
         if quantity > self._maximum:
             raise ValueError(
@@ -417,8 +418,8 @@ class PromotedProduct:
     def show(self) -> None:
         """Pretty print product.
 
-        In for legacy purposes.
-        Inverses placement of promotion description.
+        For legacy purposes.
+        Inverted placement of promotion description as to __str__.
         """
         promotion_texts = [
             promotion.display_text for promotion in self._promotions
