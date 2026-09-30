@@ -31,14 +31,14 @@ def test_PercentDiscount_valid():
     product = Product("Gadget", 100, 10)
     disctounted = PercentDiscount(30)
     assert disctounted._discount == 30
-    assert disctounted.apply_promotion(product, 2) == 140
+    assert disctounted.apply_promotion(product.price, 2) == 140
 
 
 def test_PercentDiscount_zero():
     product = Product("Gadget", 100, 10)
     disctounted = PercentDiscount(0)
     assert disctounted._discount == 0
-    assert disctounted.apply_promotion(product, 2) == 200
+    assert disctounted.apply_promotion(product.price, 2) == 200
 
 
 def test_PercentDiscount_invalid_discount():
@@ -69,7 +69,9 @@ def test_SecondHalfPrice_valid(buy_quant, reduced_price):
     regular_price = 10
     product = Product("Gadget", regular_price, 100)
     disctounted = SecondHalfPrice()
-    assert disctounted.apply_promotion(product, buy_quant) == reduced_price
+    assert (
+        disctounted.apply_promotion(product.price, buy_quant) == reduced_price
+    )
 
 
 """
@@ -88,7 +90,9 @@ def test_ThirdOneFree_valid(buy_quant, reduced_price):
     regular_price = 10
     product = Product("Gadget", regular_price, 100)
     disctounted = ThirdOneFree()
-    assert disctounted.apply_promotion(product, buy_quant) == reduced_price
+    assert (
+        disctounted.apply_promotion(product.price, buy_quant) == reduced_price
+    )
 
 
 """
@@ -140,6 +144,29 @@ def test_PromotedProduct_unknowns_passed_to_prod():
 
     assert promoted.price == 100
     assert promoted.name == "Gadget"
+
+
+def test_multiple_promotions():
+    product = Product("Gadget", 100, 10)
+    promoted = PromotedProduct(
+        product, [SecondHalfPrice(), PercentDiscount(20)]
+    )
+
+    assert promoted.buy(2) == 120
+    assert product.quantity == 8
+
+
+def test_multiple_promotions_order_independent():
+    product = Product("Gadget", 100, 10)
+    promoted1 = PromotedProduct(
+        product, [SecondHalfPrice(), PercentDiscount(20)]
+    )
+    promoted2 = PromotedProduct(
+        product, [PercentDiscount(20), SecondHalfPrice()]
+    )
+
+    assert promoted1.buy(2) == promoted2.buy(2)
+    assert product.quantity == 6
 
 
 if __name__ == "__main__":

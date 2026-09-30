@@ -369,10 +369,12 @@ class Promotion(ABC):
         """Display text for the promotion."""
 
     @abstractmethod
-    def apply_promotion(self, product: Product, quantity: int) -> float:
+    def apply_promotion(self, price_per_item: float, quantity: int) -> float:
         """Apply the promotion to the given product and quantity.
 
         Returns the discounted price.
+        Uses price_per_item instead of product to be able to chain
+        promotions.
         """
 
 
@@ -390,16 +392,27 @@ class PromotedProduct:
     (Also, it makes no sense to call f.e. the fixed class
     SecondHalfPrice with a custom name as if changing the name would
     make a difference.)
+
+    Multiple promotions can be applied where order doesn't matter, and
+    the price is calculated by applying the promotions in sequence.
+    The display text is a concatenation of the individual descriptions.
     """
 
-    def __init__(self, product: Product, promotion: Promotion) -> None:
+    def __init__(
+        self,
+        product: Product,
+        promotions: list[Promotion] | Promotion,
+    ) -> None:
         """Initialize a PromotedProduct instance."""
         if not isinstance(product, (Product, PromotedProduct)):
             raise TypeError(ERR_NOT_PRODUCT)
-        if not isinstance(promotion, Promotion):
-            raise TypeError(ERR_NOT_PROMOTION)
+        if not isinstance(promotions, list):
+            promotions = [promotions]
+        for promotion in promotions:
+            if not isinstance(promotion, Promotion):
+                raise TypeError(ERR_NOT_PROMOTION)
         self._product = product
-        self._promotion = promotion
+        self._promotions: list[Promotion] = promotions
 
     def show(self) -> None:
         """Pretty print product.
@@ -407,7 +420,11 @@ class PromotedProduct:
         In for legacy purposes.
         Inverses placement of promotion description.
         """
-        print(self._promotion.display_text, end=" ")
+        promotion_texts = [
+            promotion.display_text for promotion in self._promotions
+        ]
+
+        print(promotion_texts, end=" ")
         self._product.show()
 
     def __str__(self) -> str:
@@ -416,7 +433,10 @@ class PromotedProduct:
         Combines the product's string representation with the
         promotion's display text.
         """
-        return f"{self._product} ** {self._promotion.display_text} **"
+        promotion_texts = [
+            promotion.display_text for promotion in self._promotions
+        ]
+        return f"{self._product} ** {' '.join(promotion_texts)} **"
 
     def __getattr__(self, name: str) -> Any:  # noqa: ANN401
         """Pass all unknown properties to Product.
@@ -439,8 +459,13 @@ class PromotedProduct:
         across all products, we can't simply plug in a call into
         product.buy(). Fine for now.
         """
-        self._product.buy(quantity)
-        return self._promotion.apply_promotion(self._product, quantity)
+        total_price = self._product.buy(quantity)
+        for promotion in self._promotions:
+            total_price = promotion.apply_promotion(
+                total_price / quantity,
+                quantity,
+            )
+        return total_price
 
 
 class SecondHalfPrice(Promotion):
@@ -452,11 +477,11 @@ class SecondHalfPrice(Promotion):
         return SECONDHALFPRICE_DISPLAYTEXT
 
     @override
-    def apply_promotion(self, product: Product, quantity: int) -> float:
+    def apply_promotion(self, price_per_item: float, quantity: int) -> float:
         num_prods_half_price = quantity // 2
 
-        return product.price * quantity - (
-            product.price / 2 * num_prods_half_price
+        return price_per_item * quantity - (
+            price_per_item / 2 * num_prods_half_price
         )
 
 
@@ -469,10 +494,10 @@ class ThirdOneFree(Promotion):
         return THIRDONEFREE_DISPLAY_TEXT
 
     @override
-    def apply_promotion(self, product: Product, quantity: int) -> float:
+    def apply_promotion(self, price_per_item: float, quantity: int) -> float:
         num_prods_free = quantity // 3
 
-        return product.price * quantity - (product.price * num_prods_free)
+        return price_per_item * quantity - (price_per_item * num_prods_free)
 
 
 class PercentDiscount(Promotion):
@@ -502,8 +527,8 @@ class PercentDiscount(Promotion):
         self._discount = valid_discount
 
     @override
-    def apply_promotion(self, product: Product, quantity: int) -> float:
-        return product.price * quantity * ((100 - self._discount) / 100)
+    def apply_promotion(self, price_per_item: float, quantity: int) -> float:
+        return price_per_item * quantity * ((100 - self._discount) / 100)
 
 
 if __name__ == "__main__":
