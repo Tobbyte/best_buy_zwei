@@ -15,10 +15,12 @@ from best_buy_zwei.config import (
     ORDER_ADDED_TO_CART,
     ORDER_AMOUNT_PROMPT,
     ORDER_AVAILABLE_PRODUCTS,
+    ORDER_CART_EMPTY,
     ORDER_ERR_QUANT,
     ORDER_EXIT_PROMPT,
     ORDER_PLACED,
     ORDER_PRODUCT_PROMPT,
+    ORDER_PRODUCTS_IN_CART,
     TOTAL_STORE_STOCK_MSG,
 )
 from best_buy_zwei.products import Product
@@ -84,9 +86,9 @@ class BestBuyApp:  # pylint: disable=R0903
 
         def _print_cart() -> None:
             if not shopping_cart:
-                print("(cart is empty)")
+                print(ORDER_CART_EMPTY)
                 return
-            print("In cart:")
+            print(ORDER_PRODUCTS_IN_CART)
             for prod, qty in shopping_cart:
                 print(f"  {qty}x {prod.name}")
 

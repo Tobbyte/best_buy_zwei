@@ -11,6 +11,8 @@ ORDER_ERR_QUANT = (
     "Error placing item in cart: Only {quantity} items of '{name}' available."
 )
 ORDER_AVAILABLE_PRODUCTS = "Available products:"
+ORDER_CART_EMPTY = "Cart is empty."
+ORDER_PRODUCTS_IN_CART = "In cart:"
 
 MENU_TITLE = "Store Menu"
 MENU_PROMPT = "Choose an item by its number [1 - {count}]: "
