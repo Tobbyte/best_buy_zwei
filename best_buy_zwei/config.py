@@ -36,11 +36,11 @@ NONSTOCKPRODUCT_ERR_CANTSETQUANTITY = (
 LIMITED_PRODUCT_EXCEED_MAXIMUM = "Can't buy more than {maximum} pcs of {name}."
 
 
-def PRODUCT_PRETTY_PRINT(  # noqa: ANN201, D103, N802
+def PRODUCT_PRETTY_PRINT(  # noqa: ANN201, D103, N802 pylint: disable=invalid-name, missing-function-docstring
     name: str,
     price: float,
     quantity: float,  # pyright: ignore[reportRedeclaration]
-    active: bool,
+    active: bool,  # noqa: FBT001
     maximum: int | None = None,
 ):
     if quantity == inf:

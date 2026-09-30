@@ -37,7 +37,7 @@ class BestBuyApp:  # pylint: disable=R0903
         """Init a new instance."""
         self.store = Store(product_list)
 
-    def _place_order(self) -> None:  # noqa: C901, PLR0915
+    def _place_order(self) -> None:  # noqa: C901, PLR0915 pylint: disable=too-many-locals
         """Place an order for products.
 
         Prompts user to select products and quantities, adds them to a
@@ -50,7 +50,7 @@ class BestBuyApp:  # pylint: disable=R0903
         available_products = self.store.get_all_products()
 
         def _get_amount_in_cart(product: Product) -> int:
-            return sum([tup[1] for tup in shopping_cart if tup[0] is product])
+            return sum([tup[1] for tup in shopping_cart if tup[0] is product])  # pylint: disable=consider-using-generator
 
         def _should_abort() -> bool:
             # Print abort msg if card is empty.

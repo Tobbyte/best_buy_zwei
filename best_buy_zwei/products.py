@@ -251,14 +251,14 @@ class NonStockedProduct(Product):
 
     _quantity: float
 
-    def __init__(self, name: str, price: float) -> None:
+    def __init__(self, name: str, price: float) -> None:  # pylint: disable=super-init-not-called
         """Initialize a NonStockedProduct instance."""
         self._set_name(name)
         self._set_price(price)
         self._active = True
         self._quantity = inf
 
-    def set_quantity(self) -> None:
+    def set_quantity(self) -> None:  # pylint: disable=arguments-differ
         """Override super class.
 
         Since there's always unlimited quantity, it can't be
