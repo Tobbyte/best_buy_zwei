@@ -91,7 +91,6 @@ class BestBuyApp:  # pylint: disable=R0903
         Prompts user to select products and quantities, adds them to a
         shopping cart, and processes the order.
         """
-        # TODO: now nowhere is visible that limited prod is always bought. refactor.
         print(ORDER_AVAILABLE_PRODUCTS)
         shopping_cart = []
         product_selection = None
