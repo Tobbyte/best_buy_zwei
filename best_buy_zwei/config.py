@@ -52,3 +52,14 @@ def PRODUCT_PRETTY_PRINT(  # noqa: ANN201, D103, N802
 VALIDATE_ERR_NOT_OF_TYPE = "{name} is not of type {type}."
 VALIDATE_ERR_STR_EMPTY = "{name} can't be empty."
 VALIDATE_ERR_MUST_BE_POSITIVE = "{name} can't be negative."
+
+
+ERR_NOT_PRODUCT = "Not of type <class 'Product'>"
+ERR_NOT_PROMOTION = "Not of type <class 'Promotion'>"
+
+SECONDHALFPRICE_DISPLAYTEXT = "Second Half price!"
+
+THIRDONEFREE_DISPLAY_TEXT = "Third One Free!"
+PROMOTION_PERCENTDISCOUNT_MAXDISCOUNT = 100
+PROMOTION_PERCENTDISCOUNT_ERR_NOMORETHAN100 = "Can't discount more than 100%"
+PERCENTDISCOUNT_DISPLAYTEXT = "{discount}% off!"

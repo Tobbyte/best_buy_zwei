@@ -12,13 +12,20 @@ except ImportError:
     from typing_extensions import override
 
 from best_buy_zwei.config import (
+    ERR_NOT_PRODUCT,
+    ERR_NOT_PROMOTION,
     LIMITED_PRODUCT_EXCEED_MAXIMUM,
     NONSTOCKPRODUCT_ERR_CANTSETQUANTITY,
+    PERCENTDISCOUNT_DISPLAYTEXT,
     PRODUCT_ERR_CANTACTIVATENULLQUANT,
     PRODUCT_ERR_CANTBYINACTIVE,
     PRODUCT_ERR_CANTBYZEROQUANT,
     PRODUCT_ERR_OUTOFSTOCK,
     PRODUCT_PRETTY_PRINT,
+    PROMOTION_PERCENTDISCOUNT_ERR_NOMORETHAN100,
+    PROMOTION_PERCENTDISCOUNT_MAXDISCOUNT,
+    SECONDHALFPRICE_DISPLAYTEXT,
+    THIRDONEFREE_DISPLAY_TEXT,
     VALIDATE_ERR_MUST_BE_POSITIVE,
     VALIDATE_ERR_NOT_OF_TYPE,
     VALIDATE_ERR_STR_EMPTY,
@@ -344,16 +351,6 @@ class LimitedProduct(Product):
 #####################  Promotion Classes  #####################
 ###############################################################
 ###############################################################
-
-ERR_NOT_PRODUCT = "Not of type <class 'Product'>"
-ERR_NOT_PROMOTION = "Not of type <class 'Promotion'>"
-
-SECONDHALFPRICE_DISPLAYTEXT = "Second Half price!"
-
-THIRDONEFREE_DISPLAY_TEXT = "Third One Free!"
-PROMOTION_PERCENTDISCOUNT_MAXDISCOUNT = 100
-PROMOTION_PERCENTDISCOUNT_ERR_NOMORETHAN100 = "Can't discount more than 100%"
-PERCENTDISCOUNT_DISPLAYTEXT = "{discount}% off!"
 
 
 class Promotion(ABC):
