@@ -9,7 +9,7 @@ try:
 
 except ImportError:
     # fallback for pre 3.12
-    from typing_extensions import override  # noqa: UP035
+    from typing_extensions import override
 
 from best_buy_zwei.config import (
     LIMITED_PRODUCT_EXCEED_MAXIMUM,
@@ -190,6 +190,7 @@ class Product:
         )
 
     def __str__(self) -> str:
+        """Return a string representation of the product."""
         return PRODUCT_PRETTY_PRINT(
             self._name,
             self._price,
