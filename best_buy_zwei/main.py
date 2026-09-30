@@ -1,5 +1,16 @@
 """Main module for the Best Buy application.
 
+Dear Reviewer, v2 notes:
+I mainly added the PromotedProduct class and its associated promotion
+classes.
+The menu with its limitations are unchanged, since the focus of this
+assignment was on working with classes. (Though I did add a little
+feedback when adding to the shopping cart.)
+Please see the note in PromotedProduct: I significantly changed the
+implementation in contrast to the assignment description, but I think
+you will agree with my design.
+
+
 TODOs:
     - would be nice to show available products in cart when trying to
       place order exceeding quantity, but refrained from that for this
