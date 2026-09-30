@@ -137,7 +137,7 @@ class BestBuyApp:  # pylint: disable=R0903
         # construct and print product selection menu
         for i, avail_prod in enumerate(available_products):
             print(f"{i + 1}: ", end="")
-            avail_prod.show()
+            print(avail_prod)
 
         print("\n" + ORDER_EXIT_PROMPT + "\n")
 
@@ -204,7 +204,7 @@ class BestBuyApp:  # pylint: disable=R0903
             print(NO_PRODUCTS_IN_STORE)
         else:
             for prod in all_products:
-                prod.show()
+                print(prod)
 
     def _get_total_store_stock(self) -> None:
         """Print the total quantity of all products in the store."""

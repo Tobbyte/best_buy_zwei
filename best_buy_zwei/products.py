@@ -180,14 +180,7 @@ class Product:
 
     def show(self) -> None:
         """Print product details in a user-friendly format."""
-        print(
-            PRODUCT_PRETTY_PRINT(
-                self._name,
-                self._price,
-                self._quantity,
-                self._active,
-            ),
-        )
+        print(self)
 
     def __str__(self) -> str:
         """Return a string representation of the product."""
@@ -312,14 +305,16 @@ class LimitedProduct(Product):
 
     def show(self) -> None:
         """Print product details in a user-friendly format."""
-        print(
-            PRODUCT_PRETTY_PRINT(
-                self._name,
-                self._price,
-                self._quantity,
-                self._active,
-                self._maximum_initially,
-            ),
+        print(self)
+
+    def __str__(self) -> str:
+        """Return a string representation of the limited product."""
+        return PRODUCT_PRETTY_PRINT(
+            self._name,
+            self._price,
+            self._quantity,
+            self._active,
+            self._maximum_initially,
         )
 
     def buy(self, quantity: int) -> float:
@@ -426,7 +421,7 @@ class PromotedProduct:
         ]
 
         print(promotion_texts, end=" ")
-        self._product.show()
+        print(self._product)
 
     def __str__(self) -> str:
         """Return a string representation of the promoted product.
@@ -530,24 +525,3 @@ class PercentDiscount(Promotion):
     @override
     def apply_promotion(self, price_per_item: float, quantity: int) -> float:
         return price_per_item * quantity * ((100 - self._discount) / 100)
-
-
-if __name__ == "__main__":
-    ### nicht vergessen: kann ein prod so mehrere promos haben?
-    prod1 = Product("test prod1", 100, 10)
-    print(prod1)
-    # prod2 = Product("test prod2", 100, 10)
-    # prod3 = Product("test prod3", 100, 10)
-    test_2half = PromotedProduct(prod1, SecondHalfPrice())
-    print(test_2half.buy(2))
-    test_2half.show()
-    print(test_2half)
-    # test_3free = PromotedProduct(prod2, ThirdOneFree())
-    # test_perc = PromotedProduct(prod3, PercentDiscount(30))
-    # test_2half.show()
-    # test_3free.show()
-    # test_perc.show()
-
-    # print("2half: ", test_2half.buy(10))
-    # print("3free: ", test_3free.buy(10))
-    # print("30%: ", test_perc.buy(10))

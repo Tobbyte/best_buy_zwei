@@ -48,12 +48,24 @@ def test_NonStockedProduct_set_quantity_forbidden():
 
 """
 show
-() => "unlimited" in stdout
-but no need to test since its implemented in PRODUCT_PRETTY_PRINT
-and not changed in NonStockedProduct
 """
+def test_NonStockedProduct_show(capsys):
+    name, price = ("Gadget", 20)
+    product = NonStockedProduct(name, price)
+    product.show()
+    captured = capsys.readouterr().out
+    print(PRODUCT_PRETTY_PRINT(name, price, inf, True))
+    expected = capsys.readouterr().out
+    assert captured == expected
 
-pass
+def test_NonStockedProduct_str(capsys):
+    name, price = ("Gadget", 20)
+    product = NonStockedProduct(name, price)
+    print(product)
+    captured = capsys.readouterr().out
+    print(PRODUCT_PRETTY_PRINT(name, price, inf, True))
+    expected = capsys.readouterr().out
+    assert captured == expected
 
 
 """

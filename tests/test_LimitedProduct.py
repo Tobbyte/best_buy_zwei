@@ -76,6 +76,16 @@ def test_LimitedProduct_show(capsys):
     assert captured == expected
 
 
+def test_LimitedProduct_str(capsys):
+    name, price, quantity, maxi = ("Fee", 100, 10, 1)
+    product = LimitedProduct(name, price, quantity, maxi)
+    print(product)
+    captured = capsys.readouterr().out
+    print(PRODUCT_PRETTY_PRINT(name, price, quantity, True, maxi))
+    expected = capsys.readouterr().out
+    assert captured == expected
+
+
 """
 buy
 (2) =>

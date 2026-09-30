@@ -109,11 +109,13 @@ call w unknown properties => prop of product
 # """
 
 
-def test_PromotedProduct_valid():
+def test_PromotedProduct_valid(capsys):
     product = Product("Gadget", 100, 10)
     promoted = PromotedProduct(product, SecondHalfPrice())
     assert promoted.price == product.price
     assert "Second Half price!" in str(promoted)
+    print(promoted)
+    assert capsys.readouterr().out == f"{promoted}\n"
 
 
 def test_PromotedProduct_invalid_product():

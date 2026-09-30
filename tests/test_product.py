@@ -239,10 +239,30 @@ def test_product_show(capsys):
     assert captured == expected
 
 
+def test_product_str(capsys):
+    name, price, quantity, active = ("Gadget", 100, 10, True)
+    product = Product(name, price, quantity)
+    print(product)
+    captured = capsys.readouterr().out
+    print(PRODUCT_PRETTY_PRINT(name, price, quantity, active))
+    expected = capsys.readouterr().out
+    assert captured == expected
+
+
 def test_product_show_for_inactive(capsys):
     name, price, quantity, active = ("Gadget", 100, 0, False)
     product = Product(name, price, quantity)
     product.show()
+    captured = capsys.readouterr().out
+    print(PRODUCT_PRETTY_PRINT(name, price, quantity, active))
+    expected = capsys.readouterr().out
+    assert captured == expected
+
+
+def test_product_str_for_inactive(capsys):
+    name, price, quantity, active = ("Gadget", 100, 0, False)
+    product = Product(name, price, quantity)
+    print(product)
     captured = capsys.readouterr().out
     print(PRODUCT_PRETTY_PRINT(name, price, quantity, active))
     expected = capsys.readouterr().out
