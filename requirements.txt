@@ -1,1 +1,2 @@
 git+https://github.com/Tobbyte/valid_tobbyte_module.git@main#egg=valid_tobbyte_module
+typing_extensions

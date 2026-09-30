@@ -1,9 +1,10 @@
 """Configuration file for the Best Buy application."""
+from math import inf
 
 ORDER_PRODUCT_PROMPT = "Which product # do you want? (empty to exit) "
 ORDER_EXIT_PROMPT = "When you want to finish order, enter empty text."
 ORDER_AMOUNT_PROMPT = "What amount do you want? (empty to exit) "
-ORDER_ADDED_TO_CART = "Product added to list!"
+ORDER_ADDED_TO_CART = "Product added to cart!"
 ORDER_PLACED = "Order made! Total payment: ¤ {total:.2f}"
 ORDER_ABORT = "Abort ordering."
 ORDER_ERR_QUANT = (
@@ -27,12 +28,27 @@ PRODUCT_ERR_CANTBYINACTIVE = "Can't buy inactive {name}."
 PRODUCT_ERR_CANTBYZEROQUANT = "Can't buy 0 pcs of {name}."
 PRODUCT_ERR_CANTACTIVATENULLQUANT = "Can't activate product with quantity 0."
 
+NONSTOCKPRODUCT_ERR_CANTSETQUANTITY = (
+    "Can't set quantity of NonStockedProduct."
+)
+LIMITED_PRODUCT_EXCEED_MAXIMUM = "Can't buy more than {maximum} pcs of {name}."
 
-def PRODUCT_PRETTY_PRINT(name: str, price: float, quantity: int, active: bool):  # noqa: ANN201, D103, FBT001, N802
-    return f"'{name}', Price: {price:.2f} ¤, Quantity: {quantity}" + (
-        " (inactive)" if not active else ""
+
+def PRODUCT_PRETTY_PRINT(  # noqa: ANN201, D103, N802
+    name: str,
+    price: float,
+    quantity: float,  # pyright: ignore[reportRedeclaration]
+    active: bool,
+    maximum: int | None = None,
+):
+    if quantity == inf:
+        quantity: str = "unlimited"
+    return (
+        f"'{name}', Price: {price:.2f} ¤, Quantity: {quantity}"
+        + (" (inactive)" if not active else "")
+        + (f" Limited to {maximum} per order!" if maximum else "")
     )
 
 VALIDATE_ERR_NOT_OF_TYPE = "{name} is not of type {type}."
 VALIDATE_ERR_STR_EMPTY = "{name} can't be empty."
-VALIDATE_ERR_MUST_BE_POSITIVE = "{name} can't be negativ."
+VALIDATE_ERR_MUST_BE_POSITIVE = "{name} can't be negative."

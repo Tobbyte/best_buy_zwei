@@ -1,5 +1,16 @@
 """Main module for the Best Buy application.
 
+Dear Reviewer, v2 notes:
+I mainly added the PromotedProduct class and its associated promotion
+classes.
+The menu with its limitations are unchanged, since the focus of this
+assignment was on working with classes. (Though I did add a little
+feedback when adding to the shopping cart.)
+Please see the note in PromotedProduct: I significantly changed the
+implementation in contrast to the assignment description, but I think
+you will agree with my design.
+
+
 TODOs:
     - would be nice to show available products in cart when trying to
       place order exceeding quantity, but refrained from that for this
@@ -28,8 +39,12 @@ TODOs:
 """
 
 import sys
+from pathlib import Path
 
-from config import (
+# make runnable from wherever.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from best_buy_zwei.config import (
     ALL_PRODUCT_IN_STORE,
     MENU_LIST_ALL_PRODUCTS,
     MENU_PLACE_ORDER,
@@ -48,9 +63,17 @@ from config import (
     ORDER_PRODUCT_PROMPT,
     TOTAL_STORE_STOCK_MSG,
 )
-from products import Product
-from store import Store
-from valid_tobbyte_module.valid_tobbyte.validator_fn import (
+from best_buy_zwei.products import (
+    LimitedProduct,
+    NonStockedProduct,
+    PercentDiscount,
+    Product,
+    PromotedProduct,
+    SecondHalfPrice,
+    ThirdOneFree,
+)
+from best_buy_zwei.store import Store
+from best_buy_zwei.valid_tobbyte_module.valid_tobbyte.validator_fn import (
     validate_fn as get_valid_input,
 )
 
@@ -58,7 +81,7 @@ from valid_tobbyte_module.valid_tobbyte.validator_fn import (
 class BestBuyApp:  # pylint: disable=R0903
     """The Best Buy application."""
 
-    def __init__(self, product_list: list[Product] | None = None) -> None:
+    def __init__(self, product_list: list | None = None) -> None:
         """Init a new instance."""
         self.store = Store(product_list)
 
@@ -68,19 +91,20 @@ class BestBuyApp:  # pylint: disable=R0903
         Prompts user to select products and quantities, adds them to a
         shopping cart, and processes the order.
         """
+        # TODO: now nowhere is visible that limited prod is always bought. refactor.
         print(ORDER_AVAILABLE_PRODUCTS)
-        shopping_card = []
+        shopping_cart = []
         product_selection = None
         amount_selection = None
         available_products = self.store.get_all_products()
 
         def _get_amount_in_cart(product: Product) -> int:
-            return sum([tup[1] for tup in shopping_card if tup[0] is product])
+            return sum([tup[1] for tup in shopping_cart if tup[0] is product])
 
         def _should_abort() -> bool:
             # Print abort msg if card is empty.
             # Used in check on empty input
-            if not shopping_card:
+            if not shopping_cart:
                 print("\n" + ORDER_ABORT)
                 return True
             return False
@@ -91,33 +115,40 @@ class BestBuyApp:  # pylint: disable=R0903
                     *list(range(1, len(available_products) + 1)),
                 ],
                 prompt=ORDER_PRODUCT_PROMPT,
-                exit_promt="",
+                exit_prompt="",
             )
-
         def _get_new_amount_selection() -> int | None:
             while True:
-                # cheep fix. need to be handled cleanly
+                # cheap fix. need to be handled cleanly
                 # by valid_tobbyte_module. ok for now.
                 # Entering 0 will be treated as empty and exit the menu.
                 # Not very nice but accepted for now.
                 inp = get_valid_input(
                     valid_inputs=[int],
                     prompt=ORDER_AMOUNT_PROMPT,
-                    exit_promt="",
+                    exit_prompt="",
                 )
                 if not inp or inp > 0:
                     break
             return inp
 
+        def _print_cart() -> None:
+            if not shopping_cart:
+                print("(cart is empty)")
+                return
+            print("In cart:")
+            for prod, qty in shopping_cart:
+                print(f"  {qty}x {prod.name}")
+
         def _confirm_order() -> None:
             print("\n\n***********")
-            print(ORDER_PLACED.format(total=self.store.order(shopping_card)))
+            print(ORDER_PLACED.format(total=self.store.order(shopping_cart)))
             print("***********")
 
         # construct and print product selection menu
         for i, avail_prod in enumerate(available_products):
             print(f"{i + 1}: ", end="")
-            avail_prod.show()
+            print(avail_prod)
 
         print("\n" + ORDER_EXIT_PROMPT + "\n")
 
@@ -143,17 +174,17 @@ class BestBuyApp:  # pylint: disable=R0903
                     return
                 break
 
-            items_of_product_availale = available_products[
+            items_of_product_available = available_products[
                 product_selection
             ].get_quantity() - _get_amount_in_cart(
                 available_products[product_selection],
             )
 
-            if new_amount_selection > items_of_product_availale:
+            if new_amount_selection > items_of_product_available:
                 # user selected more than available
                 print(
                     ORDER_ERR_QUANT.format(
-                        quantity=items_of_product_availale,
+                        quantity=items_of_product_available,
                         name=available_products[product_selection].name,
                     ),
                 )
@@ -162,15 +193,17 @@ class BestBuyApp:  # pylint: disable=R0903
                 # user selected valid amount, add to shopping card
                 amount_selection = new_amount_selection
 
-                shopping_card.append((
+                shopping_cart.append((
                     available_products[product_selection],
                     amount_selection,
                 ))
 
+                print()
                 print(ORDER_ADDED_TO_CART)
+                _print_cart()
                 print()
 
-        if shopping_card:
+        if shopping_cart:
             _confirm_order()
         return
 
@@ -182,7 +215,7 @@ class BestBuyApp:  # pylint: disable=R0903
             print(NO_PRODUCTS_IN_STORE)
         else:
             for prod in all_products:
-                prod.show()
+                print(prod)
 
     def _get_total_store_stock(self) -> None:
         """Print the total quantity of all products in the store."""
@@ -234,6 +267,24 @@ def init_superstore() -> None:
         Product("MacBook Air M2", price=1450, quantity=100),
         Product("Bose QuietComfort Earbuds", price=250, quantity=500),
         Product("Google Pixel 7", price=500, quantity=250),
+        NonStockedProduct("Windows License", price=125),
+        LimitedProduct("Shipping", price=10, quantity=250, maximum=1),
+        PromotedProduct(
+            Product("Extended Warranty", price=250, quantity=250),
+            PercentDiscount(20),
+        ),
+        PromotedProduct(
+            Product("USB-C Cable", price=10, quantity=250),
+            SecondHalfPrice(),
+        ),
+        PromotedProduct(
+            Product("USB-C Adapter", price=15, quantity=250),
+            ThirdOneFree(),
+        ),
+        PromotedProduct(
+            Product("Stacked Promo Exampl", price=50, quantity=250),
+            [PercentDiscount(10), SecondHalfPrice(), ThirdOneFree()],
+        ),
     ]
     BestBuyApp(product_list).start()
 

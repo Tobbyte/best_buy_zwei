@@ -2,15 +2,15 @@
 
 from typing import Any
 
-from config import (
+from best_buy_zwei.config import (
     VALIDATE_ERR_NOT_OF_TYPE,
 )
-from products import Product
+from best_buy_zwei.products import Product, PromotedProduct
 
 
-def _validate_is_product(name: str, value: Any) -> "Product":  # noqa: ANN401
+def _validate_is_product(name: str, value: Any) -> "Product | PromotedProduct":  # noqa: ANN401
     """Validate that value is a Product instance."""
-    if not isinstance(value, Product):
+    if not isinstance(value, Product | PromotedProduct):
         raise TypeError(
             VALIDATE_ERR_NOT_OF_TYPE.format(name=name, type="Product"),
         )
