@@ -1,7 +1,15 @@
 """Product classes for the Best Buy application."""
 
+from abc import ABC, abstractmethod
 from math import inf
 from typing import Any
+
+try:
+    from typing import override  # pyright: ignore[reportAttributeAccessIssue]
+
+except ImportError:
+    # fallback for pre 3.12
+    from typing_extensions import override  # noqa: UP035
 
 from best_buy_zwei.config import (
     LIMITED_PRODUCT_EXCEED_MAXIMUM,
@@ -181,6 +189,14 @@ class Product:
             ),
         )
 
+    def __str__(self) -> str:
+        return PRODUCT_PRETTY_PRINT(
+            self._name,
+            self._price,
+            self._quantity,
+            self._active,
+        )
+
     def buy(self, quantity: int) -> float:
         """Buy a specified quantity of the product.
 
@@ -319,6 +335,192 @@ class LimitedProduct(Product):
                 ),
             )
 
+        price = super().buy(quantity)
+        # buy first to make sure it goes through before setting max
         self._set_maximum(self._maximum - quantity)
 
-        return super().buy(quantity)
+        return price
+
+
+###############################################################
+###############################################################
+#####################  Promotion Classes  #####################
+###############################################################
+###############################################################
+
+ERR_NOT_PRODUCT = "Not of type <class 'Product'>"
+ERR_NOT_PROMOTION = "Not of type <class 'Promotion'>"
+
+SECONDHALFPRICE_DISPLAYTEXT = "Second Half price!"
+
+THIRDONEFREE_DISPLAY_TEXT = "Third One Free!"
+PROMOTION_PERCENTDISCOUNT_MAXDISCOUNT = 100
+PROMOTION_PERCENTDISCOUNT_ERR_NOMORETHAN100 = "Can't discount more than 100%"
+PERCENTDISCOUNT_DISPLAYTEXT = "{discount}% off!"
+
+
+class Promotion(ABC):
+    """A common interface for all concrete promotion classes."""
+
+    @property
+    @abstractmethod
+    def display_text(self) -> str:
+        """Display text for the promotion."""
+
+    @abstractmethod
+    def apply_promotion(self, product: Product, quantity: int) -> float:
+        """Apply the promotion to the given product and quantity.
+
+        Returns the discounted price.
+        """
+
+
+class PromotedProduct:
+    """Wrap a Product with a Promotion.
+
+    I strongly deviate from the assignment: I decided that making a
+    promotion part of the product would violate the separation of
+    concerns in that a promotion is a business decision regardless of
+    a products facts like quantity and price.
+    I decided to make PromotedProduct a wrapper for a product: the store
+    is not concerned and needs no fixing, ditto Products stay ignorant.
+    The Promotion class defines the common interface for the concrete
+    Promotion classes (e.g. SecondHalfPrice).
+    (Also, it makes no sense to call f.e. the fixed class
+    SecondHalfPrice with a custom name as if changing the name would
+    make a difference.)
+    """
+
+    def __init__(self, product: Product, promotion: Promotion) -> None:
+        """Initialize a PromotedProduct instance."""
+        if not isinstance(product, (Product, PromotedProduct)):
+            raise TypeError(ERR_NOT_PRODUCT)
+        if not isinstance(promotion, Promotion):
+            raise TypeError(ERR_NOT_PROMOTION)
+        self._product = product
+        self._promotion = promotion
+
+    def show(self) -> None:
+        """Pretty print product.
+
+        In for legacy purposes.
+        Inverses placement of promotion description.
+        """
+        print(self._promotion.display_text, end=" ")
+        self._product.show()
+
+    def __str__(self) -> str:
+        """Return a string representation of the promoted product.
+
+        Combines the product's string representation with the
+        promotion's display text.
+        """
+        return f"{self._product} ** {self._promotion.display_text} **"
+
+    def __getattr__(self, name: str) -> Any:  # noqa: ANN401
+        """Pass all unknown properties to Product.
+
+        Guards against recursive self calls, f.e. when copying.
+        """
+        if name == "_product":  # tip from AI
+            raise AttributeError(name)
+        return getattr(self._product, name)
+
+    def buy(self, quantity: int) -> float:
+        """Handle the buying of the product with the applied promotion.
+
+        Leaves the regular buy() on the Product class to handle stock
+        and validation, then applies the promotion to calculate the
+        final price.
+
+        TBD:
+        - Let's say we want later to track the total of all revenue
+        across all products, we can't simply plug in a call into
+        product.buy(). Fine for now.
+        """
+        self._product.buy(quantity)
+        return self._promotion.apply_promotion(self._product, quantity)
+
+
+class SecondHalfPrice(Promotion):
+    """Promotion class that applies a "Second Half Price" discount."""
+
+    @property
+    @override
+    def display_text(self) -> str:
+        return SECONDHALFPRICE_DISPLAYTEXT
+
+    @override
+    def apply_promotion(self, product: Product, quantity: int) -> float:
+        num_prods_half_price = quantity // 2
+
+        return product.price * quantity - (
+            product.price / 2 * num_prods_half_price
+        )
+
+
+class ThirdOneFree(Promotion):
+    """Promotion class that applies a "Third One Free" discount."""
+
+    @property
+    @override
+    def display_text(self) -> str:
+        return THIRDONEFREE_DISPLAY_TEXT
+
+    @override
+    def apply_promotion(self, product: Product, quantity: int) -> float:
+        num_prods_free = quantity // 3
+
+        return product.price * quantity - (product.price * num_prods_free)
+
+
+class PercentDiscount(Promotion):
+    """Promotion class that applies a percentage discount."""
+
+    _discount: float
+
+    @property
+    @override
+    def display_text(self) -> str:
+        return PERCENTDISCOUNT_DISPLAYTEXT.format(discount=self._discount)
+
+    def __init__(self, discount: float) -> None:
+        """Initialize a PercentDiscount promotion with a given %.
+
+        Validates the discount to ensure it is non-negative and does not
+        exceed 100%.
+        """
+        super().__init__()
+
+        valid_discount = validate_non_negative_num("discount", discount)
+
+        if valid_discount > PROMOTION_PERCENTDISCOUNT_MAXDISCOUNT:
+            err_msg = PROMOTION_PERCENTDISCOUNT_ERR_NOMORETHAN100
+            raise ValueError(err_msg)
+
+        self._discount = valid_discount
+
+    @override
+    def apply_promotion(self, product: Product, quantity: int) -> float:
+        return product.price * quantity * ((100 - self._discount) / 100)
+
+
+if __name__ == "__main__":
+    ### nicht vergessen: kann ein prod so mehrere promos haben?
+    prod1 = Product("test prod1", 100, 10)
+    print(prod1)
+    # prod2 = Product("test prod2", 100, 10)
+    # prod3 = Product("test prod3", 100, 10)
+    test_2half = PromotedProduct(prod1, SecondHalfPrice())
+    print(test_2half.buy(2))
+    test_2half.show()
+    print(test_2half)
+    # test_3free = PromotedProduct(prod2, ThirdOneFree())
+    # test_perc = PromotedProduct(prod3, PercentDiscount(30))
+    # test_2half.show()
+    # test_3free.show()
+    # test_perc.show()
+
+    # print("2half: ", test_2half.buy(10))
+    # print("3free: ", test_3free.buy(10))
+    # print("30%: ", test_perc.buy(10))
