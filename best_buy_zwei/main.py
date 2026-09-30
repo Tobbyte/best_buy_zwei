@@ -46,8 +46,13 @@ TODOs:
 import sys
 from pathlib import Path
 
-from best_buy_zwei.bestbuy import BestBuyApp
-from best_buy_zwei.products import (
+# make runnable from wherever.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from best_buy_zwei.bestbuy import (  # pylint: disable=wrong-import-position
+    BestBuyApp,
+)
+from best_buy_zwei.products import (  # pylint: disable=wrong-import-position
     LimitedProduct,
     NonStockedProduct,
     PercentDiscount,
@@ -56,9 +61,6 @@ from best_buy_zwei.products import (
     SecondHalfPrice,
     ThirdOneFree,
 )
-
-# make runnable from wherever.
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
 def init_superstore() -> None:
