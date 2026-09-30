@@ -107,6 +107,18 @@ class Product:
         """Return the price of the product."""
         return self._price
 
+    def __gt__(self, other: object) -> bool:
+        """Provide a greater-than comparison based on product price."""
+        if not isinstance(other, Product):
+            return NotImplemented
+        return self._price > other.price
+
+    def __lt__(self, other: object) -> bool:
+        """Provide a lower-than comparison based on product price."""
+        if not isinstance(other, Product):
+            return NotImplemented
+        return self._price < other.price
+
     def _set_price(self, price: float) -> None:
         """Set the price of the product.
 
