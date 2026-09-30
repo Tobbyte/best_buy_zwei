@@ -113,6 +113,14 @@ class BestBuyApp:  # pylint: disable=R0903
                     break
             return inp
 
+        def _print_cart() -> None:
+            if not shopping_cart:
+                print("(cart is empty)")
+                return
+            print("In cart:")
+            for prod, qty in shopping_cart:
+                print(f"  {qty}x {prod.name}")
+
         def _confirm_order() -> None:
             print("\n\n***********")
             print(ORDER_PLACED.format(total=self.store.order(shopping_cart)))
@@ -171,7 +179,9 @@ class BestBuyApp:  # pylint: disable=R0903
                     amount_selection,
                 ))
 
+                print()
                 print(ORDER_ADDED_TO_CART)
+                _print_cart()
                 print()
 
         if shopping_cart:
